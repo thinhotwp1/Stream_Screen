@@ -37,4 +37,8 @@ dependencies {
     implementation("io.ktor:ktor-server-forwarded-header:2.2.3")
     implementation("io.ktor:ktor-server-status-pages:2.2.3")
     implementation("io.ktor:ktor-server-cors:2.2.3")
+    implementation "io.ktor:ktor-server-tomcat:2.2.3"
+
+
+
 }

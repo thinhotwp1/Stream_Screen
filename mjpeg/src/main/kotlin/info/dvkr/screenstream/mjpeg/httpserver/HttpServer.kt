@@ -1,5 +1,7 @@
 package info.dvkr.screenstream.mjpeg.httpserver
 
+import io.ktor.server.http.content.staticBasePackage
+
 import android.content.Context
 import android.graphics.Bitmap
 import com.elvishew.xlog.XLog
@@ -10,11 +12,11 @@ import info.dvkr.screenstream.mjpeg.image.NotificationBitmap
 import info.dvkr.screenstream.mjpeg.settings.MjpegSettings
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.server.tomcat.Tomcat
+import io.ktor.server.tomcat.TomcatApplicationEngine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
 import java.net.BindException
 import java.security.KeyFactory
@@ -61,13 +63,12 @@ internal class HttpServer(
     private val stopDeferred: AtomicReference<CompletableDeferred<Unit>?> = AtomicReference(null)
     private lateinit var blockedJPEG: ByteArray
 
-    private var ktorServer: CIOApplicationEngine? = null
+    private var ktorServer: TomcatApplicationEngine? = null
 
     init {
         XLog.d(getLog("init"))
     }
 
-    @KtorExperimentalAPI
     fun start(serverAddresses: List<NetInterface>) {
         XLog.d(getLog("startServer"))
 
@@ -118,20 +119,45 @@ internal class HttpServer(
             clientData.configure()
         }
 
+        //
+//        val keystorePassword = "123456".toCharArray()
+//        val keyAlias = "123456"
+//        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+//        keyStore.load(null)
+//
+//        // Load chứng chỉ từ tệp certificate.crt và khóa riêng tư từ tệp private.key
+//        val certificateBytes = certificateInputStream.readBytes()
+//        val privateKeyBytes = privateKeyInputStream.readBytes()
+//
+//        // Đặt chứng chỉ vào keystore
+//        keyStore.setCertificateEntry(keyAlias, certificateBytes.toCertificate())
+//
+//        // Đặt khóa riêng tư vào keystore
+//        keyStore.setKeyEntry(keyAlias, privateKeyBytes.toPrivateKey(), keystorePassword, arrayOf(certificateBytes.toCertificate()))
+//
 //        val environment = applicationEngineEnvironment {
 //            parentCoroutineContext = coroutineScope.coroutineContext
 //            watchPaths = emptyList() // Fix for java.lang.ClassNotFoundException: java.nio.file.FileSystems for API < 26
-//            module { appModule(httpServerFiles, clientData, mjpegSharedFlow, lastJPEG, blockedJPEG, stopDeferred) { sendEvent(it) } }
+//            module {
+//                appModule(httpServerFiles, clientData, mjpegSharedFlow, lastJPEG, blockedJPEG, stopDeferred) { sendEvent(it) }
+//            }
 //            serverAddresses.forEach { netInterface ->
-//                connector {
+//                sslConnector(keyStore, keyAlias, { keystorePassword }, { keystorePassword }) {
+//                    // Cấu hình các thuộc tính của kết nối SSL
 //                    host = netInterface.address.hostAddress!!
-//                    port = runBlocking(parentCoroutineContext) { mjpegSettings.serverPortFlow.first() }
+//                    keyStorePath = null // Không sử dụng đường dẫn đến keystore file
+//                    trustStore = null // Không sử dụng trust store
+//                    port = 443 // Cổng HTTPS
+////                    port = runBlocking(parentCoroutineContext) { mjpegSettings.serverPortFlow.first() }
+//                    enabledProtocols = listOf("TLSv1.2") // Các giao thức được hỗ trợ
 //                }
 //            }
 //        }
+//        ktorServer = embeddedServer(CIO, environment) {
+//            connectionIdleTimeoutSeconds = 10
+//        }
 
-        //
-
+        //2
 
         val keystorePassword = "123456".toCharArray()
         val keyAlias = "123456"
@@ -155,29 +181,43 @@ internal class HttpServer(
                 appModule(httpServerFiles, clientData, mjpegSharedFlow, lastJPEG, blockedJPEG, stopDeferred) { sendEvent(it) }
             }
             serverAddresses.forEach { netInterface ->
-//                sslConnector(keyStore, keyAlias, { keystorePassword }, { keystorePassword }) {
-//                    // Cấu hình các thuộc tính của kết nối SSL
-//                    host = netInterface.address.hostAddress!!
-//                    keyStorePath = null // Không sử dụng đường dẫn đến keystore file
-//                    trustStore = null // Không sử dụng trust store
-//                    port = 443 // Cổng HTTPS
-////                    port = runBlocking(parentCoroutineContext) { mjpegSettings.serverPortFlow.first() }
-//                    enabledProtocols = listOf("TLSv1.2") // Các giao thức được hỗ trợ
-//                }
-                connector {
+                sslConnector(keyStore, keyAlias, { keystorePassword }, { keystorePassword }) {
+                    // Cấu hình các thuộc tính của kết nối SSL
                     host = netInterface.address.hostAddress!!
-                    port = runBlocking(parentCoroutineContext) { mjpegSettings.serverPortFlow.first() }
+                    keyStorePath = null // Không sử dụng đường dẫn đến keystore file
+                    trustStore = null // Không sử dụng trust store
+                    port = 443 // Cổng HTTPS
+//                    port = runBlocking(parentCoroutineContext) { mjpegSettings.serverPortFlow.first() }
+                    enabledProtocols = listOf("TLSv1.2") // Các giao thức được hỗ trợ
                 }
+
             }
         }
 
+        ktorServer = embeddedServer(Tomcat, environment)
 
-        //
+
+        //3
 
 
-        ktorServer = embeddedServer(CIO, environment) {
-            connectionIdleTimeoutSeconds = 10
-        }
+
+
+        //3
+
+//        val environment = applicationEngineEnvironment {
+//            parentCoroutineContext = coroutineScope.coroutineContext
+//            watchPaths = emptyList() // Fix for java.lang.ClassNotFoundException: java.nio.file.FileSystems for API < 26
+//            module { appModule(httpServerFiles, clientData, mjpegSharedFlow, lastJPEG, blockedJPEG, stopDeferred) { sendEvent(it) } }
+//            serverAddresses.forEach { netInterface ->
+//                connector {
+//                    host = netInterface.address.hostAddress!!
+//                    port = runBlocking(parentCoroutineContext) { mjpegSettings.serverPortFlow.first() }
+//                }
+//            }
+//        }
+
+
+
 
         var exception: AppError? = null
         try {

@@ -12,10 +12,8 @@ import info.dvkr.screenstream.mjpeg.image.NotificationBitmap
 import info.dvkr.screenstream.mjpeg.settings.MjpegSettings
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.jetty.Jetty
-import io.ktor.server.jetty.JettyApplicationEngine
-import io.ktor.server.netty.Netty
-import io.ktor.server.netty.NettyApplicationEngine
+import io.ktor.server.tomcat.Tomcat
+import io.ktor.server.tomcat.TomcatApplicationEngine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.ByteArrayOutputStream
@@ -65,7 +63,7 @@ internal class HttpServer(
     private val stopDeferred: AtomicReference<CompletableDeferred<Unit>?> = AtomicReference(null)
     private lateinit var blockedJPEG: ByteArray
 
-    private var ktorServer: NettyApplicationEngine? = null
+    private var ktorServer: TomcatApplicationEngine? = null
 
     init {
         XLog.d(getLog("init"))
@@ -196,7 +194,7 @@ internal class HttpServer(
             }
         }
 
-        ktorServer = embeddedServer(Netty, environment)
+        ktorServer = embeddedServer(Tomcat, environment)
 
 
         //3

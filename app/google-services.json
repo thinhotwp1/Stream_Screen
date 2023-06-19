@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "933812947924",
+    "project_id": "screenstream-cba7b",
+    "storage_bucket": "screenstream-cba7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933812947924:android:26ba3c3936a43f8d322441",
+        "android_client_info": {
+          "package_name": "info.dvkr.screenstream"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933812947924-i9lusdkfc5v4kk5mc4d598ul1jok4sds.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "info.dvkr.screenstream",
+            "certificate_hash": "195da148a9a6d5d8d07e749a08389b9d73383636"
+          }
+        },
+        {
+          "client_id": "933812947924-ui8263r1jd57m5nj2pmhin5pq02r55j8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCknppuBSA_Rm_ftugJmlSXXTUnX9hokbw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933812947924-ui8263r1jd57m5nj2pmhin5pq02r55j8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
